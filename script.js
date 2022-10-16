@@ -2,6 +2,10 @@ const calculator = document.querySelector('.calculator');
 const display = document.querySelector('.calculator_display');
 const keys = document.querySelector('.calculator_keys');
 
+const calculate = (firstValue, operator, secondValue) => {
+    return eval(`${firstValue} ${operator} ${secondValue}`);
+}
+
 keys.onclick = (e) => {
     const key = e.target;
     const keyContent = e.target.textContent;
@@ -9,6 +13,12 @@ keys.onclick = (e) => {
     const displaydNum = display.textContent;
 
     if (key.matches('button')) {
+        // remove the "is-depressed" class from all operators keys
+        for (child of keys.children) {
+            if (child.className == 'key--operator is-depressed') {
+                child.classList.remove('is-depressed');
+            }
+        }
         if (!action) {
             // numeric key
             if (displaydNum == 0) {
@@ -26,8 +36,12 @@ keys.onclick = (e) => {
                 action == 'multiply' ||
                 action == 'divide' 
             ) {
+                // adds a class to the pressed operator key
                 key.classList.add('is-depressed');
-                if (displaydNum == 0) {
+                // adds a costum atribute
+                const previousKeyType = calculator.dataset.previousKeyType = 'operator';
+                
+                if (displaydNum === 0 || previousKeyType === 'operator') {
                     // doesn't allow the user to inset a operator without a number
                     display.textContent = display.textContent;
                 } else {
@@ -40,14 +54,14 @@ keys.onclick = (e) => {
             } else if (action == 'clear') {
                 display.textContent = '0';
             } else if (action == 'calculate') {
-                // remove the "is-depressed" class from all operators keys
-                for (child of keys.children) {
-                    if (child.className == 'key--operator is-depressed') {
-                        child.classList.remove('is-depressed');
-                    }
-                }
 
-                display.textContent = eval(display.textContent); 
+                const firstValue = calculator.dataset.firstValue = displaydNum;
+                const operator = calculator.dataset.operator = action;
+                const secondValue = displaydNum;
+
+                display.textContent = calculate(firstValue, operator, secondValue);
+
+                
             }
         }
     }
